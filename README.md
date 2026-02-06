@@ -1,0 +1,1 @@
+# authuman-client-solution-template

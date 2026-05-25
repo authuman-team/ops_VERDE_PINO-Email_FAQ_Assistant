@@ -1,0 +1,532 @@
+{
+  "name": "llm_gemini_json_gateway",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "solution"
+            },
+            {
+              "name": "environment"
+            },
+            {
+              "name": "provider_account"
+            },
+            {
+              "name": "cost_center"
+            },
+            {
+              "name": "credential_name"
+            },
+            {
+              "name": "parent_workflow_name"
+            },
+            {
+              "name": "parent_workflow_id"
+            },
+            {
+              "name": "parent_execution_id"
+            },
+            {
+              "name": "node_name"
+            },
+            {
+              "name": "customer_id"
+            },
+            {
+              "name": "currency"
+            },
+            {
+              "name": "model"
+            },
+            {
+              "name": "system_prompt"
+            },
+            {
+              "name": "prompt_text"
+            },
+            {
+              "name": "response_schema_json"
+            },
+            {
+              "name": "temperature",
+              "type": "number"
+            },
+            {
+              "name": "raw_response_json"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "edecbe9a-cbc5-4331-94e0-b6bdb17f0914",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = JSON.parse($json.raw_response_json);\nconst triggerCtx = $('When Executed by Another Workflow').first().json;\n\nconst text =\n  raw.candidates?.[0]?.content?.parts\n    ?.map(part => part.text || '')\n    .join('') || '';\n\nlet parsed;\ntry {\n  parsed = JSON.parse(text);\n} catch (e) {\n  throw new Error(`Gemini did not return valid JSON. Raw text: ${text.slice(0, 1000)}`);\n}\n\nconst usage = raw.usageMetadata || {};\n\nreturn [{\n  json: {\n    output: parsed,\n\n    ts: new Date().toISOString(),\n    execution_id: String(triggerCtx.parent_execution_id || ''),\n    workflow_id: String(triggerCtx.parent_workflow_id || ''),\n    workflow_name: triggerCtx.parent_workflow_name || '',\n\n    solution: triggerCtx.solution || '',\n    environment: triggerCtx.environment || '',\n    provider: 'gemini',\n    provider_account: triggerCtx.provider_account || '',\n    cost_center: triggerCtx.cost_center || '',\n    credential_name: triggerCtx.credential_name || '',\n    model: triggerCtx.model || '',\n    node_name: triggerCtx.node_name || '',\n    customer_id: triggerCtx.customer_id || '',\n    status: 'success',\n    request_id: raw.responseId || raw.id || '',\n    error_message: '',\n\n    input_tokens: Number(usage.promptTokenCount || 0),\n    output_tokens: Number(usage.candidatesTokenCount || 0),\n    cache_tokens: Number(usage.cachedContentTokenCount || 0),\n    thought_tokens: Number(usage.thoughtsTokenCount || 0),\n    total_tokens: Number(usage.totalTokenCount || 0),\n\n    estimated_cost: 0,\n    currency: triggerCtx.currency || 'USD',\n    prompt_chars: (triggerCtx.prompt_text || '').length,\n    response_chars: text.length,\n    is_streaming: false,\n    cache_hit: Number(usage.cachedContentTokenCount || 0) > 0,\n    metadata_json: JSON.stringify({\n      usageMetadata: usage,\n      promptFeedback: raw.promptFeedback || null,\n      finishReason: raw.candidates?.[0]?.finishReason || null,\n    }),\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "337b4914-7e45-4ffd-8b73-5e2e6d067e78",
+      "name": "Parse Gemini Response"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "TacJjitA7LbuNSOH",
+          "mode": "list",
+          "cachedResultName": "llm_usage_log",
+          "cachedResultUrl": "/projects/41IUOwnPPe1iD35g/datatables/TacJjitA7LbuNSOH"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "is_streaming": false,
+            "cache_hit": false
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ts",
+              "displayName": "ts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "workflow_id",
+              "displayName": "workflow_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "workflow_name",
+              "displayName": "workflow_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "solution",
+              "displayName": "solution",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "environment",
+              "displayName": "environment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "provider",
+              "displayName": "provider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "provider_account",
+              "displayName": "provider_account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cost_center",
+              "displayName": "cost_center",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "credential_name",
+              "displayName": "credential_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "model",
+              "displayName": "model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "node_name",
+              "displayName": "node_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "request_id",
+              "displayName": "request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "error_message",
+              "displayName": "error_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "input_tokens",
+              "displayName": "input_tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "output_tokens",
+              "displayName": "output_tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cache_tokens",
+              "displayName": "cache_tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "thought_tokens",
+              "displayName": "thought_tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total_tokens",
+              "displayName": "total_tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "estimated_cost",
+              "displayName": "estimated_cost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "currency",
+              "displayName": "currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "prompt_chars",
+              "displayName": "prompt_chars",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "response_chars",
+              "displayName": "response_chars",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "is_streaming",
+              "displayName": "is_streaming",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cache_hit",
+              "displayName": "cache_hit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata_json",
+              "displayName": "metadata_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "price_lookup_status",
+              "displayName": "price_lookup_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "price_lookup_key",
+              "displayName": "price_lookup_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        0
+      ],
+      "id": "2c321ec6-790b-4bd0-b10d-9fc4868e3648",
+      "name": "Log LLM Usage",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    output: $('Parse Gemini Response').first().json.output\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        0
+      ],
+      "id": "8f5bd7ab-cebe-4947-8fd4-86a9828b5244",
+      "name": "Return Parsed Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { output, ...logRow } = $json;\n\nreturn [{\n  json: logRow\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        0
+      ],
+      "id": "9771b654-4658-4974-8ad7-a04c1e4567d0",
+      "name": "Prepare Usage Log Row"
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $json;\n\n// Keep this central and reusable.\n// Keys must match exactly the model value your workflows store.\nconst PRICE_BOOK = {\n  gemini: {\n    \"gemini-2.5-flash-lite\": {\n      inputPerMillion: 0.10,\n      outputPerMillion: 0.40,\n      cachedInputPerMillion: 0.025,\n      includeThoughtTokensInOutput: true,\n    },\n    \"gemini-2.5-flash-lite-preview-09-2025\": {\n      inputPerMillion: 0.10,\n      outputPerMillion: 0.40,\n      cachedInputPerMillion: 0.025,\n      includeThoughtTokensInOutput: true,\n    },\n    \"gemini-2.5-flash\": {\n      inputPerMillion: 0.30,\n      outputPerMillion: 2.50,\n      cachedInputPerMillion: 0.03,\n      includeThoughtTokensInOutput: true,\n    },\n    \"gemini-2.5-flash-preview-09-2025\": {\n      inputPerMillion: 0.30,\n      outputPerMillion: 2.50,\n      cachedInputPerMillion: 0.03,\n      includeThoughtTokensInOutput: true,\n    },\n  },\n\n  openai: {\n    \"gpt-5.4\": {\n      inputPerMillion: 2.50,\n      outputPerMillion: 15.00,\n      cachedInputPerMillion: 0.25,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-5.4 mini\": {\n      inputPerMillion: 0.75,\n      outputPerMillion: 4.50,\n      cachedInputPerMillion: 0.075,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-5.5\": {\n      inputPerMillion: 5.00,\n      outputPerMillion: 30.00,\n      cachedInputPerMillion: 0.50,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-5\": {\n      inputPerMillion: 1.25,\n      outputPerMillion: 10.00,\n      cachedInputPerMillion: 0.125,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-5-mini\": {\n      inputPerMillion: 0.25,\n      outputPerMillion: 2.00,\n      cachedInputPerMillion: 0.025,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-5-nano\": {\n      inputPerMillion: 0.05,\n      outputPerMillion: 0.40,\n      cachedInputPerMillion: 0.005,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-4.1\": {\n      inputPerMillion: 2.00,\n      outputPerMillion: 8.00,\n      cachedInputPerMillion: 0.50,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-4.1-mini\": {\n      inputPerMillion: 0.40,\n      outputPerMillion: 1.60,\n      cachedInputPerMillion: 0.10,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-4.1-nano\": {\n      inputPerMillion: 0.10,\n      outputPerMillion: 0.40,\n      cachedInputPerMillion: 0.025,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-4o\": {\n      inputPerMillion: 2.50,\n      outputPerMillion: 10.00,\n      cachedInputPerMillion: 1.25,\n      includeThoughtTokensInOutput: false,\n    },\n    \"gpt-4o-mini\": {\n      inputPerMillion: 0.15,\n      outputPerMillion: 0.60,\n      cachedInputPerMillion: 0.075,\n      includeThoughtTokensInOutput: false,\n    },\n    \"o3\": {\n      inputPerMillion: 2.00,\n      outputPerMillion: 8.00,\n      cachedInputPerMillion: 0.50,\n      includeThoughtTokensInOutput: false,\n    },\n    \"o4-mini\": {\n      inputPerMillion: 1.10,\n      outputPerMillion: 4.40,\n      cachedInputPerMillion: 0.275,\n      includeThoughtTokensInOutput: false,\n    },\n  },\n};\n\nfunction normalizeProvider(value) {\n  return String(value || \"\").trim().toLowerCase();\n}\n\nfunction normalizeModel(value) {\n  const model = String(value || \"\").trim();\n\n  // Normalize dated OpenAI model variants, e.g. gpt-4.1-mini-2025-04-14 -> gpt-4.1-mini\n  return model.replace(/-\\d{4}-\\d{2}-\\d{2}$/, \"\");\n}\n\nconst provider = normalizeProvider(row.provider);\nconst model = normalizeModel(row.model);\n\nconst providerBook = PRICE_BOOK[provider] || {};\nconst pricing = providerBook[model];\n\nif (!pricing) {\n  return [{\n    json: {\n      ...row,\n      estimated_cost: null,\n      price_lookup_status: \"missing_model_pricing\",\n      price_lookup_key: `${provider}:${model}`,\n    }\n  }];\n}\n\nconst inputTokens = Number(row.input_tokens || 0);\nconst outputTokens = Number(row.output_tokens || 0);\nconst cacheTokens = Number(row.cache_tokens || 0);\nconst thoughtTokens = Number(row.thought_tokens || 0);\n\n// Cached tokens are already included inside input_tokens.\n// Do not charge them twice.\nconst billableCachedInputTokens = Math.min(cacheTokens, inputTokens);\nconst billableRegularInputTokens = Math.max(inputTokens - billableCachedInputTokens, 0);\n\nconst billableOutputTokens = pricing.includeThoughtTokensInOutput\n  ? outputTokens + thoughtTokens\n  : outputTokens;\n\nconst inputCost =\n  (billableRegularInputTokens / 1_000_000) * Number(pricing.inputPerMillion || 0);\n\nconst cacheCost =\n  (billableCachedInputTokens / 1_000_000) * Number(pricing.cachedInputPerMillion || 0);\n\nconst outputCost =\n  (billableOutputTokens / 1_000_000) * Number(pricing.outputPerMillion || 0);\n\nconst estimatedCost = Number((inputCost + cacheCost + outputCost).toFixed(8));\n\nreturn [{\n  json: {\n    ...row,\n    estimated_cost: estimatedCost,\n    price_lookup_status: \"ok\",\n    price_lookup_key: `${provider}:${model}`,\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "8e283fb8-f61d-4e14-a14c-1d068d10d384",
+      "name": "Estimate LLM Cost"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Parse Gemini Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Gemini Response": {
+      "main": [
+        [
+          {
+            "node": "Estimate LLM Cost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log LLM Usage": {
+      "main": [
+        [
+          {
+            "node": "Return Parsed Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return Parsed Output": {
+      "main": [
+        []
+      ]
+    },
+    "Prepare Usage Log Row": {
+      "main": [
+        [
+          {
+            "node": "Log LLM Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estimate LLM Cost": {
+      "main": [
+        [
+          {
+            "node": "Prepare Usage Log Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aaedc178-ac8d-4a84-8c82-b17f912e8f36",
+  "meta": {
+    "instanceId": "52cfe0571df1e20be2d0f7eaf1a0ff314c4c81af94a9f1e4242e226f1ddd09bf"
+  },
+  "id": "UPLRKrgRFckO9G4I",
+  "tags": []
+}

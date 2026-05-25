@@ -176,3 +176,44 @@ flowchart TD
       G --> W
       O --> W
     end
+```
+
+##Key architectural risks
+1. The workflow currently uses Gmail snippet instead of full body.
+2. The FAQ is hard-coded in n8n.
+3. The responder prompt expression appears to start with =={{, which should be corrected to ={{.
+4. The workflow calls the responder even for messages the classifier may classify as not processable.
+5. Node names still reference "Invoice Data", which is misleading and should be renamed.
+6. No explicit human-handoff label exists in the false branch.
+7. There is no explicit duplicate-reply guard beyond normal Gmail threading behavior.
+
+##3C hardening absorption
+
+Already compliant:
+
+- Conservative responder behavior.
+- Structured JSON schemas.
+- Temperature 0.
+- Human fallback when context is insufficient.
+- LLM usage logging.
+- No OCR or attachment processing.
+- No credential storage in repository.
+
+Recommended small changes:
+
+- Retrieve full Gmail body.
+- Fix =={{ expression in responder prompt.
+- Add classifier IF before responder.
+- Externalise FAQ into /config.
+- Add "Needs human reply" label.
+- Rename invoice-related node names.
+- Align workflow environment value from dev to pilot.
+- Add workflow sticky notes describing safe-answer boundaries.
+
+Explicitly not to do:
+
+- Do not connect the assistant to reservation availability or pricing until a validated source exists.
+- Do not answer complaints, payment, invoices, damages, cancellations, or exceptions automatically.
+- Do not expand FAQ behavior by prompt wording only; update approved FAQ/config first.
+- Do not store Gmail or Gemini credentials in GitHub.
+- Do not process attachments or OCR unless explicitly designed and documented.

@@ -180,7 +180,7 @@ flowchart TD
 
 ---
 
-##Key architectural risks
+## Key architectural risks
 1. The workflow currently uses Gmail snippet instead of full body.
 2. The FAQ is hard-coded in n8n.
 3. The responder prompt expression appears to start with =={{, which should be corrected to ={{.
@@ -189,9 +189,9 @@ flowchart TD
 6. No explicit human-handoff label exists in the false branch.
 7. There is no explicit duplicate-reply guard beyond normal Gmail threading behavior.
 
-##3C hardening absorption
+## 3C hardening absorption
 
-Already compliant:
+### Already compliant:
 
 - Conservative responder behavior.
 - Structured JSON schemas.
@@ -201,7 +201,7 @@ Already compliant:
 - No OCR or attachment processing.
 - No credential storage in repository.
 
-Recommended small changes:
+### Recommended small changes:
 
 - Retrieve full Gmail body.
 - Fix =={{ expression in responder prompt.
@@ -212,7 +212,7 @@ Recommended small changes:
 - Align workflow environment value from dev to pilot.
 - Add workflow sticky notes describing safe-answer boundaries.
 
-Explicitly not to do:
+### Explicitly not to do:
 
 - Do not connect the assistant to reservation availability or pricing until a validated source exists.
 - Do not answer complaints, payment, invoices, damages, cancellations, or exceptions automatically.

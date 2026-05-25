@@ -178,6 +178,8 @@ flowchart TD
     end
 ```
 
+---
+
 ##Key architectural risks
 1. The workflow currently uses Gmail snippet instead of full body.
 2. The FAQ is hard-coded in n8n.
